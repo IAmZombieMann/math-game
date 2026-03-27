@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fábrica de Cristales Espaciales</title>
+    <style>
+      :root {
+        --bg: #08122f;
+        --card: rgba(14, 30, 71, 0.9);
+        --ink: #e9f2ff;
+        --u: #53b8ff;
+        --d: #ff5b6e;
+        --c: #4be089;
+        --accent: #ffd463;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Montserrat", "Trebuchet MS", Arial, sans-serif;
+        color: var(--ink);
+        min-height: 100vh;
+        background: radial-gradient(circle at 20% 10%, #152d67 0%, #0a1334 40%, #060a1b 100%);
+        overflow-x: hidden;
+      }
+      .stars {
+        position: fixed; inset: 0; pointer-events: none;
+        background-image:
+          radial-gradient(2px 2px at 10% 20%, #fff, transparent),
+          radial-gradient(2px 2px at 70% 30%, #d9f2ff, transparent),
+          radial-gradient(2px 2px at 30% 70%, #fff, transparent),
+          radial-gradient(2px 2px at 85% 80%, #d9f2ff, transparent);
+        animation: twinkle 3s infinite alternate;
+      }
+      @keyframes twinkle { from { opacity: 0.5; } to { opacity: 1; } }
+
+      .app {
+        width: min(1024px, 95vw);
+        margin: 0 auto;
+        padding: 14px;
+      }
+      .panel {
+        background: var(--card);
+        border: 2px solid rgba(255,255,255,0.2);
+        border-radius: 18px;
+        padding: 14px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      }
+      h1, h2, h3 { margin: 0.2rem 0; }
+      .hero {
+        display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      }
+      .robot { font-size: 2.3rem; filter: drop-shadow(0 0 10px #7ecbff); }
+      .subtitle { font-size: 1.1rem; color: #cbe7ff; }
+
+      .state-screen { display: none; margin-top: 10px; }
+      .state-screen.active { display: block; }
+
+      .btn {
+        border: none;
+        border-radius: 14px;
+        padding: 12px 16px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #05142f;
+        cursor: pointer;
+        min-width: 120px;
+      }
+      .btn-main { background: linear-gradient(130deg, #ffd463, #ffb049); }
+      .btn-u { background: var(--u); color: white; }
+      .btn-d { background: var(--d); color: white; }
+      .btn-c { background: var(--c); color: #042619; }
+      .btn-soft { background: #d6e7ff; }
+
+      .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+      .big {
+        font-size: clamp(1.5rem, 4vw, 2.2rem);
+        font-weight: 800;
+      }
+      .pill {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.2);
+        font-weight: 700;
+      }
+      .feedback {
+        margin-top: 10px;
+        min-height: 28px;
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+      .ok { color: #8dfac0; }
+      .bad { color: #ff9ca7; }
+
+      .options { margin-top: 12px; }
+      .option-btn {
+        width: 100%; padding: 12px;
+        border-radius: 14px; border: 2px solid transparent;
+        background: #f5f9ff; color: #0d2248;
+        font-weight: 800; font-size: 1.25rem;
+        cursor: pointer;
+      }
+      .option-btn:hover { border-color: #69c5ff; }
+
+      .warehouse {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 10px;
+      }
+      .counter-box {
+        background: rgba(255,255,255,0.08);
+        border-radius: 14px;
+        padding: 10px;
+      }
+      .count-line { font-size: 1.2rem; font-weight: 800; margin: 8px 0; }
+      .legend { font-size: 0.95rem; line-height: 1.45; color: #c6def9; }
+      canvas {
+        width: 100%; height: 430px;
+        background: rgba(3,12,30,0.7);
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.2);
+      }
+
+      .burst {
+        position: fixed;
+        width: 12px; height: 12px; border-radius: 50%;
+        animation: boom 800ms ease-out forwards;
+        pointer-events: none;
+      }
+      @keyframes boom {
+        from { transform: translate(0,0) scale(1); opacity: 1; }
+        to { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+      }
+
+      @media (max-width: 860px) {
+        .warehouse { grid-template-columns: 1fr; }
+        .grid-3 { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stars"></div>
+    <main class="app">
+      <section class="panel hero">
+        <div>
+          <h1>🚀 Fábrica de Cristales Espaciales</h1>
+          <p class="subtitle">Aprende series de 2, 3 y 4 + valor posicional con robots y cristales.</p>
+        </div>
+        <div class="robot">🤖💎</div>
+      </section>
+
+      <section id="pantalla_inicio" class="panel state-screen active">
+        <h2>¡Hola explorador/a espacial!</h2>
+        <p>Tu misión tiene 2 niveles:</p>
+        <ol>
+          <li><strong>Camino de Energía</strong>: completa series numéricas.</li>
+          <li><strong>Almacén Galáctico</strong>: arma números con centenas, decenas y unidades.</li>
+        </ol>
+        <div class="row">
+          <button class="btn btn-main" id="startBtn">Comenzar misión</button>
+          <span class="pill">Objetivo: llegar a la felicitación final 🎉</span>
+        </div>
+      </section>
+
+      <section id="nivel_series" class="panel state-screen">
+        <div class="row" style="justify-content: space-between;">
+          <h2>⚡ Nivel 1: Camino de Energía</h2>
+          <span class="pill" id="seriesProgress">Reto 1/8</span>
+        </div>
+        <p id="seriesRule" class="big"></p>
+        <p id="seriesPrompt" class="big"></p>
+        <div class="grid-3 options" id="seriesOptions"></div>
+        <div id="seriesFeedback" class="feedback"></div>
+      </section>
+
+      <section id="nivel_posicional" class="panel state-screen">
+        <div class="row" style="justify-content: space-between;">
+          <h2>🛰️ Nivel 2: Almacén Galáctico</h2>
+          <span class="pill" id="positionalRound">Ronda 1/4</span>
+        </div>
+        <p class="big">Número objetivo: <span id="targetNumber"></span></p>
+        <div class="warehouse">
+          <div class="counter-box">
+            <h3>Controles de carga</h3>
+            <div class="row">
+              <button class="btn btn-c" id="addC">+100 (C)</button>
+              <button class="btn btn-soft" id="subC">-100</button>
+            </div>
+            <div class="row">
+              <button class="btn btn-d" id="addD">+10 (D)</button>
+              <button class="btn btn-soft" id="subD">-10</button>
+            </div>
+            <div class="row">
+              <button class="btn btn-u" id="addU">+1 (U)</button>
+              <button class="btn btn-soft" id="subU">-1</button>
+            </div>
+            <button class="btn btn-main" id="checkPositional">Verificar (checkAnswer)</button>
+            <button class="btn btn-soft" id="resetPositional">Reiniciar contadores</button>
+            <p class="count-line">C: <span id="countC">0</span> | D: <span id="countD">0</span> | U: <span id="countU">0</span></p>
+            <p class="legend">
+              🔵 Unidades (U) = cristales sueltos<br />
+              🔴 Decenas (D) = barras de 10 cristales<br />
+              🟢 Centenas (C) = cubos de 100 cristales
+            </p>
+            <div id="positionalFeedback" class="feedback"></div>
+          </div>
+          <canvas id="warehouseCanvas" width="700" height="430" aria-label="Visualización de cristales"></canvas>
+        </div>
+      </section>
+
+      <section id="felicitacion_final" class="panel state-screen">
+        <h2>🌟 ¡Misión completada, capitán/a espacial! 🌟</h2>
+        <p class="big">Dominaste series y valor posicional.</p>
+        <p id="finalStats"></p>
+        <button class="btn btn-main" id="playAgain">Jugar otra vez</button>
+      </section>
+    </main>
+
+    <script>
+      const game = {
+        state: "pantalla_inicio",
+        seriesRound: 0,
+        seriesGoal: 8,
+        seriesCurrent: null,
+        score: 0,
+        positionalRound: 0,
+        positionalGoal: 4,
+        target: 0,
+        C: 0,
+        D: 0,
+        U: 0
+      };
+
+      const screens = ["pantalla_inicio", "nivel_series", "nivel_posicional", "felicitacion_final"];
+      const seriesRule = document.getElementById("seriesRule");
+      const seriesPrompt = document.getElementById("seriesPrompt");
+      const seriesOptions = document.getElementById("seriesOptions");
+      const seriesFeedback = document.getElementById("seriesFeedback");
+      const seriesProgress = document.getElementById("seriesProgress");
+
+      const targetNumber = document.getElementById("targetNumber");
+      const countC = document.getElementById("countC");
+      const countD = document.getElementById("countD");
+      const countU = document.getElementById("countU");
+      const positionalRound = document.getElementById("positionalRound");
+      const positionalFeedback = document.getElementById("positionalFeedback");
+      const finalStats = document.getElementById("finalStats");
+      const canvas = document.getElementById("warehouseCanvas");
+      const ctx = canvas.getContext("2d");
+
+      function setState(next) {
+        game.state = next;
+        screens.forEach((id) => {
+          document.getElementById(id).classList.toggle("active", id === next);
+        });
+      }
+
+      function rand(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function playTone(freq, ms = 110, type = "triangle", gain = 0.06) {
+        const ac = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ac.createOscillator();
+        const g = ac.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        g.gain.value = gain;
+        osc.connect(g);
+        g.connect(ac.destination);
+        osc.start();
+        setTimeout(() => {
+          g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.03);
+          osc.stop(ac.currentTime + 0.04);
+        }, ms);
+      }
+
+      function clinc() {
+        playTone(840, 70, "triangle", 0.05);
+        setTimeout(() => playTone(1120, 70, "triangle", 0.05), 60);
+      }
+
+      function boing() {
+        playTone(220, 130, "sawtooth", 0.04);
+      }
+
+      function burstSuccess(x = window.innerWidth * 0.5, y = window.innerHeight * 0.25) {
+        const colors = ["#53b8ff", "#ff5b6e", "#4be089", "#ffd463", "#fff"];
+        for (let i = 0; i < 36; i++) {
+          const dot = document.createElement("div");
+          dot.className = "burst";
+          dot.style.left = `${x}px`;
+          dot.style.top = `${y}px`;
+          dot.style.background = colors[i % colors.length];
+          dot.style.setProperty("--tx", `${rand(-140, 140)}px`);
+          dot.style.setProperty("--ty", `${rand(-120, 120)}px`);
+          document.body.appendChild(dot);
+          setTimeout(() => dot.remove(), 850);
+        }
+      }
+
+      function setupSeriesRound() {
+        const step = [2, 3, 4][rand(0, 2)];
+        const start = rand(0, 8) * step;
+        const correct = start + step;
+
+        const options = new Set([correct]);
+        while (options.size < 3) {
+          const candidate = correct + rand(-6, 6);
+          if (candidate >= 0 && candidate !== correct) options.add(candidate);
+        }
+
+        game.seriesCurrent = { step, start, correct, options: [...options].sort(() => Math.random() - 0.5) };
+        seriesRule.textContent = `Patrón: suma de ${step} en ${step}`;
+        seriesPrompt.textContent = `${start} → ¿Cuál sigue?`;
+        seriesOptions.innerHTML = "";
+        game.seriesCurrent.options.forEach((n) => {
+          const btn = document.createElement("button");
+          btn.className = "option-btn";
+          btn.textContent = n;
+          btn.onclick = () => checkAnswer("series", n);
+          seriesOptions.appendChild(btn);
+        });
+        seriesProgress.textContent = `Reto ${game.seriesRound + 1}/${game.seriesGoal}`;
+      }
+
+      function startPositionalRound() {
+        game.C = 0; game.D = 0; game.U = 0;
+        game.target = rand(100, 999);
+        targetNumber.textContent = game.target;
+        positionalRound.textContent = `Ronda ${game.positionalRound + 1}/${game.positionalGoal}`;
+        positionalFeedback.textContent = "Construye el número usando C, D y U.";
+        positionalFeedback.className = "feedback";
+        updateCounters();
+        drawWarehouse();
+      }
+
+      function updateCounters() {
+        countC.textContent = game.C;
+        countD.textContent = game.D;
+        countU.textContent = game.U;
+      }
+
+      function currentValue() {
+        return game.C * 100 + game.D * 10 + game.U;
+      }
+
+      function drawWarehouse() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#9acaff";
+        ctx.font = "bold 20px Montserrat";
+        ctx.fillText("Visual del almacén", 20, 30);
+
+        // Centenas: cubos verdes
+        for (let i = 0; i < game.C; i++) {
+          const x = 30 + (i % 5) * 54;
+          const y = 60 + Math.floor(i / 5) * 54;
+          ctx.fillStyle = "#4be089";
+          ctx.fillRect(x, y, 44, 44);
+          ctx.fillStyle = "rgba(255,255,255,0.25)";
+          ctx.fillRect(x + 8, y + 8, 28, 28);
+        }
+
+        // Decenas: barras rojas
+        for (let i = 0; i < game.D; i++) {
+          const x = 330 + (i % 4) * 44;
+          const y = 70 + Math.floor(i / 4) * 24;
+          ctx.fillStyle = "#ff5b6e";
+          ctx.fillRect(x, y, 34, 16);
+        }
+
+        // Unidades: cristales azules
+        for (let i = 0; i < game.U; i++) {
+          const x = 330 + (i % 8) * 24;
+          const y = 250 + Math.floor(i / 8) * 24;
+          ctx.fillStyle = "#53b8ff";
+          ctx.beginPath();
+          ctx.arc(x, y, 8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.fillStyle = "#c8e7ff";
+        ctx.font = "bold 16px Montserrat";
+        ctx.fillText("🟢 Centenas (cubos de 100)", 20, 350);
+        ctx.fillText("🔴 Decenas (barras de 10)", 330, 220);
+        ctx.fillText("🔵 Unidades (cristales de 1)", 330, 400);
+      }
+
+      // Requisito solicitado: función checkAnswer()
+      function checkAnswer(mode, answer = null) {
+        if (mode === "series") {
+          const ok = Number(answer) === game.seriesCurrent.correct;
+          if (ok) {
+            game.score += 10;
+            clinc();
+            burstSuccess();
+            seriesFeedback.textContent = "¡Correcto! El robot avanzó ⚡";
+            seriesFeedback.className = "feedback ok";
+            game.seriesRound += 1;
+            if (game.seriesRound >= game.seriesGoal) {
+              setTimeout(() => {
+                setState("nivel_posicional");
+                game.positionalRound = 0;
+                startPositionalRound();
+              }, 650);
+            } else {
+              setTimeout(setupSeriesRound, 600);
+            }
+          } else {
+            boing();
+            seriesFeedback.textContent = `Casi... la respuesta correcta era ${game.seriesCurrent.correct}.`;
+            seriesFeedback.className = "feedback bad";
+          }
+          return;
+        }
+
+        if (mode === "posicional") {
+          const ok = currentValue() === game.target;
+          if (ok) {
+            game.score += 20;
+            clinc();
+            burstSuccess(window.innerWidth * 0.55, window.innerHeight * 0.35);
+            positionalFeedback.textContent = "¡Perfecto! Tu almacén coincide con el número objetivo 🚀";
+            positionalFeedback.className = "feedback ok";
+            game.positionalRound += 1;
+            if (game.positionalRound >= game.positionalGoal) {
+              setTimeout(() => {
+                setState("felicitacion_final");
+                finalStats.textContent = `Puntaje final: ${game.score} cristales de energía.`;
+              }, 700);
+            } else {
+              setTimeout(startPositionalRound, 700);
+            }
+          } else {
+            boing();
+            positionalFeedback.textContent = `Tu valor actual es ${currentValue()}. Intenta llegar a ${game.target}.`;
+            positionalFeedback.className = "feedback bad";
+          }
+        }
+      }
+
+      // Eventos
+      document.getElementById("startBtn").onclick = () => {
+        game.seriesRound = 0;
+        game.score = 0;
+        setState("nivel_series");
+        setupSeriesRound();
+      };
+
+      document.getElementById("addC").onclick = () => { if (game.C < 9) { game.C++; clinc(); updateCounters(); drawWarehouse(); } };
+      document.getElementById("subC").onclick = () => { if (game.C > 0) { game.C--; updateCounters(); drawWarehouse(); } };
+      document.getElementById("addD").onclick = () => { if (game.D < 9) { game.D++; clinc(); updateCounters(); drawWarehouse(); } };
+      document.getElementById("subD").onclick = () => { if (game.D > 0) { game.D--; updateCounters(); drawWarehouse(); } };
+      document.getElementById("addU").onclick = () => { if (game.U < 9) { game.U++; clinc(); updateCounters(); drawWarehouse(); } };
+      document.getElementById("subU").onclick = () => { if (game.U > 0) { game.U--; updateCounters(); drawWarehouse(); } };
+
+      document.getElementById("checkPositional").onclick = () => checkAnswer("posicional");
+      document.getElementById("resetPositional").onclick = () => {
+        game.C = 0; game.D = 0; game.U = 0;
+        updateCounters();
+        drawWarehouse();
+      };
+      document.getElementById("playAgain").onclick = () => {
+        setState("pantalla_inicio");
+      };
+
+      // Primer render del canvas
+      drawWarehouse();
+    </script>
+  </body>
+</html>
