@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MateAventura Kawaii</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="stars"></div>
+    <main class="game-shell">
+      <header class="top-banner">
+        <h1>🌈 MateAventura Kawaii 🌈</h1>
+        <p>¡Aprende jugando! Cada reto te hace más fuerte en matemáticas.</p>
+      </header>
+
+      <section class="scoreboard" aria-label="Panel de puntajes y progreso">
+        <article>
+          <h2>Puntos ⭐</h2>
+          <p id="score">0</p>
+        </article>
+        <article>
+          <h2>Racha 🔥</h2>
+          <p id="streak">0</p>
+        </article>
+        <article>
+          <h2>Nivel 🏆</h2>
+          <p id="level">1</p>
+        </article>
+        <article>
+          <h2>Tiempo ⏱️</h2>
+          <p id="timer">120</p>
+        </article>
+      </section>
+
+      <section class="strategy-box">
+        <h3>Estrategia Pro</h3>
+        <p id="strategy-text">
+          Consejo: para contar de 2 en 2, salta siempre al siguiente número par.
+        </p>
+      </section>
+
+      <section class="mission-panel" aria-live="polite">
+        <h2 id="challenge-title">Reto 1: Cuenta de 2 en 2</h2>
+        <p id="challenge-question">Completa la secuencia: 2, 4, 6, __</p>
+
+        <div class="answers" id="answers"></div>
+
+        <div class="feedback" id="feedback">¡Vamos! Tú puedes ✨</div>
+      </section>
+
+      <section class="progress-section">
+        <h3>Progreso de habilidades</h3>
+        <div class="skills-grid">
+          <div class="skill-card">
+            <span>2 en 2</span>
+            <div class="bar"><div id="progress-2" class="fill"></div></div>
+          </div>
+          <div class="skill-card">
+            <span>3 en 3</span>
+            <div class="bar"><div id="progress-3" class="fill"></div></div>
+          </div>
+          <div class="skill-card">
+            <span>4 en 4</span>
+            <div class="bar"><div id="progress-4" class="fill"></div></div>
+          </div>
+          <div class="skill-card">
+            <span>Unidades/Decenas/Centenas</span>
+            <div class="bar"><div id="progress-place" class="fill"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="controls">
+        <button id="next-btn" class="next-btn">Siguiente reto ➡️</button>
+        <button id="restart-btn" class="restart-btn">Reiniciar juego 🔄</button>
+      </section>
+
+      <section class="goal-card">
+        <h3>Misión de hoy</h3>
+        <ul>
+          <li>✔ Contar de 2 en 2, de 3 en 3 y de 4 en 4</li>
+          <li>✔ Separar unidades, decenas y centenas</li>
+          <li>✔ Mantener una racha para ganar estrellas extra</li>
+        </ul>
+      </section>
+    </main>
+
+    <div id="end-modal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <h2>🎉 ¡Juego terminado!</h2>
+        <p id="final-message"></p>
+        <button id="play-again">Jugar otra vez</button>
+      </div>
+    </div>
+
+    <script src="game.js"></script>
+  </body>
+</html>
