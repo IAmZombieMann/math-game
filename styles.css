@@ -1,0 +1,250 @@
+:root {
+  --pink: #ff8fc7;
+  --rose: #ff6fb2;
+  --lavender: #a989ff;
+  --mint: #7bf2d3;
+  --cloud: #f7f8ff;
+  --ink: #3d3b63;
+  --card: rgba(255, 255, 255, 0.85);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Baloo 2", system-ui, sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at 20% 20%, #ffe6fa 0%, #dff6ff 45%, #f6efff 100%);
+  overflow-x: hidden;
+}
+
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.9) 0 2px, transparent 2px),
+    radial-gradient(circle at 80% 40%, rgba(255, 255, 255, 0.7) 0 3px, transparent 3px),
+    radial-gradient(circle at 65% 80%, rgba(255, 255, 255, 0.8) 0 2px, transparent 2px);
+  animation: twinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  from {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+.game-shell {
+  position: relative;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1rem 1rem 2rem;
+}
+
+.top-banner {
+  text-align: center;
+  background: linear-gradient(135deg, rgba(255, 143, 199, 0.85), rgba(169, 137, 255, 0.85));
+  color: white;
+  border-radius: 24px;
+  padding: 0.8rem 1rem;
+  box-shadow: 0 10px 30px rgba(85, 63, 155, 0.25);
+}
+
+.top-banner h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+}
+
+.top-banner p {
+  margin: 0.2rem 0 0;
+  font-size: 1.1rem;
+}
+
+.scoreboard {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.scoreboard article {
+  background: var(--card);
+  border: 3px solid white;
+  border-radius: 20px;
+  text-align: center;
+  padding: 0.7rem;
+  box-shadow: 0 8px 18px rgba(82, 70, 150, 0.15);
+}
+
+.scoreboard h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.scoreboard p {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.strategy-box,
+.mission-panel,
+.progress-section,
+.goal-card {
+  margin-top: 1rem;
+  background: var(--card);
+  border-radius: 22px;
+  border: 3px solid white;
+  padding: 1rem;
+  box-shadow: 0 12px 20px rgba(71, 65, 120, 0.13);
+}
+
+.strategy-box {
+  background: linear-gradient(120deg, rgba(123, 242, 211, 0.45), rgba(255, 255, 255, 0.82));
+}
+
+.strategy-box h3,
+.progress-section h3,
+.goal-card h3 {
+  margin: 0 0 0.4rem;
+}
+
+#challenge-title {
+  margin-top: 0;
+  font-size: 1.4rem;
+}
+
+#challenge-question {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.answers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.7rem;
+}
+
+.answer-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.7rem 0.8rem;
+  font-size: 1.15rem;
+  font-family: inherit;
+  font-weight: 700;
+  background: linear-gradient(160deg, #ffffff, #f4f0ff);
+  box-shadow: 0 6px 14px rgba(78, 64, 138, 0.17);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.answer-btn:hover,
+.answer-btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(75, 53, 162, 0.24);
+  outline: 3px solid rgba(123, 242, 211, 0.7);
+}
+
+.feedback {
+  margin-top: 0.7rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  min-height: 1.5rem;
+}
+
+.skills-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.skill-card {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  padding: 0.6rem;
+}
+
+.bar {
+  margin-top: 0.35rem;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--pink), var(--lavender));
+  transition: width 0.35s ease;
+}
+
+.controls {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.controls button,
+#play-again {
+  border: none;
+  border-radius: 16px;
+  padding: 0.7rem 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.next-btn {
+  background: linear-gradient(120deg, #96f5d3, #7cd4ff);
+}
+
+.restart-btn,
+#play-again {
+  background: linear-gradient(120deg, #ffc1de, #f9a8ff);
+}
+
+.goal-card ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(52, 43, 87, 0.5);
+}
+
+.modal-content {
+  width: min(500px, 92vw);
+  background: white;
+  border-radius: 24px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .scoreboard {
+    grid-template-columns: repeat(2, minmax(130px, 1fr));
+  }
+
+  .top-banner p {
+    font-size: 1rem;
+  }
+}
