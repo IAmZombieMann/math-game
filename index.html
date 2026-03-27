@@ -10,22 +10,22 @@
     <style>
       :root {
         --bg: #2a2a4a;
-        --cream: #fefdf5;
-        --brown: #8b5a2b;
-        --ink: #4a2e19;
-        --u: #4dd0e1;
-        --d: #ff8a80;
-        --c: #81c784;
-        --cloud: #fff7ea;
+        --cream: #fffdf9;
+        --brown: #6f4d2d;
+        --ink: #402715;
+        --u: #46d0f6;
+        --d: #ff8f9f;
+        --c: #86d89f;
+        --cloud: #fff7ef;
       }
       * { box-sizing: border-box; }
       body {
         margin: 0;
         min-height: 100vh;
         font-family: "Quicksand", sans-serif;
-        background: radial-gradient(circle at 15% 20%, #ffd8f2 0%, transparent 26%),
-          radial-gradient(circle at 80% 30%, #c2f6ff 0%, transparent 26%),
-          radial-gradient(circle at 50% 90%, #ffd9e6 0%, transparent 28%),
+        background: radial-gradient(circle at 15% 20%, #ffd8f2 0%, transparent 34%),
+          radial-gradient(circle at 80% 30%, #c2f6ff 0%, transparent 34%),
+          radial-gradient(circle at 50% 90%, #ffd9e6 0%, transparent 36%),
           var(--bg);
         color: var(--ink);
         overflow-x: hidden;
@@ -45,69 +45,71 @@
         padding: 24px;
       }
       .panel {
-        background: var(--cream);
-        border: 5px solid var(--brown);
-        border-radius: 34px;
-        padding: 30px;
-        margin-bottom: 20px;
-        box-shadow: 0 14px 0 rgba(88, 56, 27, 0.45);
+        background: linear-gradient(180deg, #fffefb, #fff8ef);
+        border: 4px solid var(--brown);
+        border-radius: 28px;
+        padding: 20px;
+        margin-bottom: 14px;
+        box-shadow: 0 10px 0 rgba(88, 56, 27, 0.35);
       }
       .screen { display: none; }
       .screen.active { display: block; }
 
       h1, h2 { margin: 0 0 10px; }
-      .title { font-size: clamp(30px, 4.3vw, 44px); }
-      .mission-title { font-size: clamp(30px, 4.6vw, 40px); margin-bottom: 16px; }
-      .big-number { font-size: clamp(56px, 8vw, 70px); font-weight: 800; line-height: 1; }
-      .helper-text { font-size: clamp(20px, 3vw, 28px); font-weight: 700; margin: 10px 0 14px; }
+      .title { font-size: clamp(24px, 3.2vw, 34px); }
+      .mission-title { font-size: clamp(24px, 3.3vw, 32px); margin-bottom: 10px; }
+      .big-number { font-size: clamp(42px, 6vw, 54px); font-weight: 800; line-height: 1; }
+      .helper-text { font-size: clamp(16px, 2vw, 21px); font-weight: 700; margin: 6px 0 10px; }
 
       .btn {
-        border: 5px solid var(--brown);
+        border: 4px solid var(--brown);
         border-radius: 999px;
-        background: #ffeaa5;
+        background: linear-gradient(130deg, #ffe995, #ffd175);
         color: var(--ink);
-        font-size: clamp(20px, 2.8vw, 26px);
+        font-size: clamp(16px, 2.1vw, 20px);
         font-weight: 800;
-        padding: 25px 40px;
+        padding: 14px 22px;
         cursor: pointer;
       }
       .btn:active { transform: translateY(2px); }
+      .btn:hover { filter: brightness(1.03); }
       .btn-row { display: flex; flex-wrap: wrap; gap: 20px; }
 
       .series-layout {
         display: grid;
-        grid-template-columns: 270px 1fr;
-        gap: 30px;
+        grid-template-columns: 220px 1fr;
+        gap: 18px;
         align-items: start;
       }
       .robot {
         background: #fff2d6;
-        border: 5px solid var(--brown);
-        border-radius: 28px;
-        padding: 24px;
+        border: 4px solid var(--brown);
+        border-radius: 24px;
+        padding: 12px;
         text-align: center;
-        font-size: 120px;
+        font-size: 86px;
       }
       .platforms {
         display: grid;
         grid-template-columns: repeat(2, minmax(190px, 1fr));
-        gap: 30px;
+        gap: 16px;
       }
       .platform {
         background: var(--cloud);
-        border: 5px solid var(--brown);
+        border: 4px solid var(--brown);
         border-radius: 999px;
-        min-height: 170px;
+        min-height: 120px;
         display: grid;
         place-items: center;
         text-align: center;
         cursor: pointer;
-        padding: 25px;
+        padding: 14px;
         transition: transform 0.18s ease, background 0.2s ease;
       }
       .platform:hover { transform: translateY(-4px); }
-      .platform .num { font-size: clamp(52px, 7vw, 66px); font-weight: 800; }
-      .platform .face { font-size: 28px; }
+      .platform:nth-child(2n) { background: linear-gradient(180deg, #fffdfa, #ffeef6); }
+      .platform .num { font-size: clamp(38px, 5vw, 50px); font-weight: 800; }
+      .platform .face { font-size: 20px; }
       .platform.wrong { animation: wrongShake 420ms ease; background: #d8d8d8; }
       @keyframes wrongShake {
         0%,100% { transform: translateX(0); }
@@ -121,45 +123,45 @@
         100% { transform: translateY(0); }
       }
 
-      .feedback { min-height: 44px; font-size: clamp(22px, 3vw, 28px); font-weight: 800; margin-top: 18px; }
+      .feedback { min-height: 34px; font-size: clamp(17px, 2.2vw, 21px); font-weight: 800; margin-top: 12px; }
       .ok { color: #198754; }
       .bad { color: #b33d3d; }
 
       .target-cloud {
         background: #fff4fc;
-        border: 6px solid var(--brown);
+        border: 4px solid var(--brown);
         border-radius: 999px;
-        padding: 14px 32px;
+        padding: 8px 18px;
         display: inline-flex;
         align-items: center;
         gap: 18px;
-        margin-bottom: 25px;
+        margin-bottom: 14px;
       }
 
       .zones {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 30px;
+        gap: 16px;
       }
       .zone {
         background: #fffdf8;
-        border: 5px solid var(--brown);
-        border-radius: 26px;
-        padding: 20px;
-        min-height: 340px;
+        border: 4px solid var(--brown);
+        border-radius: 20px;
+        padding: 12px;
+        min-height: 230px;
       }
       .zone h3 {
         margin: 0 0 12px;
-        font-size: clamp(24px, 3.4vw, 32px);
+        font-size: clamp(18px, 2.2vw, 24px);
       }
       .tray {
-        border: 4px dashed var(--brown);
-        border-radius: 20px;
-        min-height: 220px;
-        padding: 18px;
+        border: 3px dashed var(--brown);
+        border-radius: 16px;
+        min-height: 150px;
+        padding: 10px;
         display: flex;
         flex-wrap: wrap;
-        gap: 30px;
+        gap: 16px;
         align-content: flex-start;
       }
 
@@ -194,7 +196,7 @@
         font-weight: 800;
       }
 
-      .controls { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 20px; }
+      .controls { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 12px; }
       .btn-c { background: var(--c); }
       .btn-d { background: var(--d); }
       .btn-u { background: var(--u); }
