@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Hotel de los Bichitos Brillantes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --mint: #b8f3d7;
+      --sky: #b7ddff;
+      --panel: #f7feff;
+      --ink: #2c4a45;
+      --green: #73d59c;
+      --red: #ff9aac;
+      --blue: #82c9ff;
+      --yellow-neon: #fff86f;
+      --danger: #ffb8c9;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; }
+    body {
+      font-family: "Quicksand", sans-serif;
+      overflow: hidden;
+      color: var(--ink);
+      background: linear-gradient(170deg, var(--mint), var(--sky));
+    }
+
+    .layer { position: fixed; inset: 0; pointer-events: none; }
+    .leaves {
+      background:
+        radial-gradient(180px 100px at 15% 18%, rgba(106, 187, 129, 0.30), transparent 70%),
+        radial-gradient(160px 90px at 84% 26%, rgba(106, 187, 129, 0.28), transparent 70%),
+        radial-gradient(220px 110px at 56% 8%, rgba(106, 187, 129, 0.22), transparent 70%);
+      animation: sway 8s ease-in-out infinite alternate;
+    }
+    .fireflies span {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 0 14px rgba(255,255,255,0.9);
+      animation: drift linear infinite;
+    }
+    @keyframes sway {
+      from { transform: translateX(-10px); }
+      to { transform: translateX(10px); }
+    }
+    @keyframes drift {
+      from { transform: translateY(0) translateX(0); opacity: 0.3; }
+      to { transform: translateY(-120vh) translateX(40px); opacity: 1; }
+    }
+
+    .app {
+      position: relative;
+      z-index: 5;
+      width: 100%;
+      height: 100%;
+      padding: 16px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 10px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border-radius: 25px;
+      padding: 14px;
+      box-shadow: 10px 10px 20px rgba(118, 162, 178, 0.26), -10px -10px 20px rgba(255,255,255,0.8);
+      transition: all 0.4s ease-out;
+    }
+
+    h1 { margin: 0; font-size: clamp(24px, 3vw, 32px); }
+    .instruction { margin: 0; font-size: clamp(18px, 2.6vw, 24px); font-weight: 800; text-align: center; }
+    .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .status { font-size: 16px; font-weight: 700; }
+
+    .scene { display: none; transition: all 0.4s ease-out; }
+    .scene.active { display: block; }
+
+    .elevator-grid { display: grid; grid-template-columns: 180px 1fr; gap: 12px; }
+    .ladybug {
+      min-height: 170px;
+      display: grid;
+      place-items: center;
+      font-size: 88px;
+      background: #fff8f2;
+      border-radius: 20px;
+      transition: all 0.4s ease-out;
+    }
+    .ladybug.bee-scale {
+      transform: scale(1.12);
+      filter: drop-shadow(0 0 8px rgba(255, 188, 60, 0.55));
+    }
+
+    .elevator-card {
+      border-radius: 20px;
+      background: #f4ffff;
+      padding: 10px;
+    }
+    .floor-num { font-size: clamp(40px, 5vw, 56px); font-weight: 800; text-align: center; }
+
+    .count-guide { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 8px 0 10px; }
+    .count-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(80, 80, 80, 0.2);
+      border: 2px solid rgba(60, 60, 60, 0.25);
+      cursor: pointer;
+      transition: all 0.4s ease-out;
+    }
+    .count-dot.on {
+      background: var(--yellow-neon);
+      box-shadow: 0 0 12px rgba(255, 248, 111, 0.95);
+      transform: translateY(-2px) scale(1.08);
+    }
+
+    .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .bubble-btn {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto;
+      border: none;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(142, 212, 255, 0.85));
+      box-shadow: inset -10px -12px 18px rgba(95, 172, 224, 0.4), inset 8px 8px 12px rgba(255,255,255,0.9);
+      color: #2a5565;
+      font-size: clamp(30px, 4vw, 40px);
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.4s ease-out;
+      position: relative;
+    }
+    .bubble-btn::after {
+      content: "";
+      position: absolute;
+      top: 18px;
+      left: 25px;
+      width: 26px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.85);
+      transform: rotate(-20deg);
+    }
+    .bubble-btn:hover { transform: scale(1.08); }
+    .bubble-btn.error {
+      animation: shake 0.3s linear 2;
+      background: radial-gradient(circle at 30% 30%, #ffe6ef, var(--danger));
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
+    .pay-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .wood-board {
+      background: #f2d7ab;
+      border-radius: 18px;
+      padding: 10px;
+      font-size: clamp(26px, 3.6vw, 34px);
+      font-weight: 800;
+      text-align: center;
+    }
+    .wood-board .digit { transition: all 0.4s ease-out; }
+    .digit.c.on { color: var(--green); text-shadow: 0 0 10px rgba(115,213,156,.8); }
+    .digit.d.on { color: var(--red); text-shadow: 0 0 10px rgba(255,154,172,.8); }
+    .digit.u.on { color: var(--blue); text-shadow: 0 0 10px rgba(130,201,255,.8); }
+
+    .baskets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .basket {
+      border-radius: 18px;
+      background: #fff;
+      padding: 8px;
+      text-align: center;
+    }
+    .basket button {
+      width: 100px;
+      height: 100px;
+      border: none;
+      border-radius: 50%;
+      font-size: 30px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.4s ease-out;
+      box-shadow: inset -10px -12px 18px rgba(0,0,0,0.12), inset 8px 8px 12px rgba(255,255,255,0.85);
+    }
+    .basket.c button { background: var(--green); }
+    .basket.d button { background: var(--red); }
+    .basket.u button { background: var(--blue); }
+    .basket button:hover { transform: scale(1.07); }
+
+    .cup {
+      border-radius: 18px;
+      background: #f9ffff;
+      padding: 10px;
+      min-height: 170px;
+    }
+    .items { min-height: 80px; font-size: 32px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .formula { font-size: clamp(24px, 3vw, 30px); font-weight: 800; }
+    .formula .c { color: var(--green); }
+    .formula .d { color: var(--red); }
+    .formula .u { color: var(--blue); }
+
+    .controls { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .controls button {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #e9f8ff;
+      transition: all 0.4s ease-out;
+    }
+
+    .msg { min-height: 34px; text-align: center; font-size: 20px; font-weight: 800; }
+    .ok { color: #2f9a6b; }
+    .bad { color: #c45c74; }
+
+    @media (max-width: 900px) {
+      .elevator-grid, .pay-layout { grid-template-columns: 1fr; }
+      .choices, .baskets { grid-template-columns: 1fr; }
+      .bubble-btn, .basket button { width: 90px; height: 90px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layer leaves"></div>
+  <div class="layer fireflies" id="fireflies"></div>
+
+  <main class="app">
+    <header class="panel top">
+      <h1>El Hotel de los Bichitos Brillantes</h1>
+      <div class="status" id="status">Puntos: 0 | Aciertos: 0 | Serie actual: +2</div>
+    </header>
+
+    <section class="panel"><p class="instruction" id="instruction">¡Lleva a la mariquita de 2 en 2!</p></section>
+
+    <section class="panel scene active" id="sceneSeries">
+      <div class="elevator-grid">
+        <div class="ladybug" id="ladybug">🐝</div>
+        <div class="elevator-card">
+          <div class="floor-num" id="elevatorFloor">2 → ?</div>
+          <div class="count-guide" id="countGuide"></div>
+          <div class="choices" id="seriesChoices"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel scene" id="scenePlace">
+      <div class="pay-layout">
+        <div>
+          <div class="wood-board" id="board">Costo: <span id="digitC" class="digit c">3</span><span id="digitD" class="digit d">1</span><span id="digitU" class="digit u">4</span> gotas</div>
+          <div class="baskets">
+            <div class="basket c"><button id="addC">Saco 100</button><div>Cesta C</div></div>
+            <div class="basket d"><button id="addD">Frasco 10</button><div>Cesta D</div></div>
+            <div class="basket u"><button id="addU">Gota 1</button><div>Cesta U</div></div>
+          </div>
+          <div class="controls">
+            <button id="checkPay">Verificar</button>
+            <button id="resetPay">Reiniciar</button>
+          </div>
+        </div>
+        <div class="cup">
+          <div class="items" id="items"></div>
+          <div class="formula" id="formula">0 + 0 + 0 = 0</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="panel msg" id="msg">Toca para empezar la aventura.</footer>
+  </main>
+
+  <script>
+    const state = {
+      score: 0,
+      hits: 0,
+      currentScene: 'series',
+      seriesType: 2,
+      start: 2,
+      next: 4,
+      correct: 6,
+      guidePoints: [],
+      target: 314,
+      C: 0,
+      D: 0,
+      U: 0
+    };
+
+    const fireflies = document.getElementById('fireflies');
+    const status = document.getElementById('status');
+    const instruction = document.getElementById('instruction');
+    const msg = document.getElementById('msg');
+    const sceneSeries = document.getElementById('sceneSeries');
+    const scenePlace = document.getElementById('scenePlace');
+    const elevatorFloor = document.getElementById('elevatorFloor');
+    const countGuide = document.getElementById('countGuide');
+    const seriesChoices = document.getElementById('seriesChoices');
+    const ladybug = document.getElementById('ladybug');
+    const items = document.getElementById('items');
+    const formula = document.getElementById('formula');
+    const digitC = document.getElementById('digitC');
+    const digitD = document.getElementById('digitD');
+    const digitU = document.getElementById('digitU');
+
+    function initFireflies() {
+      for (let i = 0; i < 18; i++) {
+        const dot = document.createElement('span');
+        dot.style.left = `${Math.random() * 100}%`;
+        dot.style.top = `${Math.random() * 100}%`;
+        dot.style.animationDuration = `${6 + Math.random() * 8}s`;
+        dot.style.animationDelay = `${Math.random() * 4}s`;
+        fireflies.appendChild(dot);
+      }
+    }
+
+    function tone(freq, duration = 0.09, type = 'triangle', gainValue = 0.05) {
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.value = gainValue;
+      osc.connect(gain);
+      gain.connect(ac.destination);
+      osc.start();
+      setTimeout(() => {
+        gain.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.03);
+        osc.stop(ac.currentTime + 0.04);
+      }, duration * 1000);
+    }
+    function piano(noteIndex) {
+      const notes = [261, 294, 329, 349, 392, 440];
+      tone(notes[noteIndex % notes.length], 0.07, 'triangle', 0.04);
+    }
+    function magicBell() { [660, 880, 1046].forEach((f, i) => setTimeout(() => tone(f, 0.1, 'triangle', 0.06), i * 80)); }
+    function softError() { [220, 180].forEach((f, i) => setTimeout(() => tone(f, 0.08, 'sawtooth', 0.04), i * 80)); }
+
+    function updateStatus() {
+      status.textContent = `Puntos: ${state.score} | Aciertos: ${state.hits} | Serie actual: +${state.seriesType}`;
+    }
+
+    function setScene(name) {
+      state.currentScene = name;
+      sceneSeries.classList.toggle('active', name === 'series');
+      scenePlace.classList.toggle('active', name === 'place');
+    }
+
+    function sparkle(x = window.innerWidth * 0.5, y = window.innerHeight * 0.35) {
+      for (let i = 0; i < 20; i++) {
+        const s = document.createElement('div');
+        s.style.position = 'fixed';
+        s.style.left = `${x}px`;
+        s.style.top = `${y}px`;
+        s.style.width = '10px';
+        s.style.height = '10px';
+        s.style.borderRadius = '50%';
+        s.style.background = i % 2 ? '#fff' : '#ffd447';
+        s.style.boxShadow = '0 0 8px rgba(255,255,255,0.9)';
+        s.style.pointerEvents = 'none';
+        s.style.transition = 'all 0.7s ease-out';
+        document.body.appendChild(s);
+        requestAnimationFrame(() => {
+          s.style.transform = `translate(${Math.random() * 160 - 80}px, ${Math.random() * 160 - 80}px) scale(0.2)`;
+          s.style.opacity = '0';
+        });
+        setTimeout(() => s.remove(), 720);
+      }
+    }
+
+    function buildGuide() {
+      state.guidePoints = Array.from({ length: state.seriesType }, () => false);
+      countGuide.innerHTML = '';
+      state.guidePoints.forEach((_, idx) => {
+        const d = document.createElement('button');
+        d.className = 'count-dot';
+        d.onclick = () => {
+          state.guidePoints[idx] = !state.guidePoints[idx];
+          d.classList.toggle('on', state.guidePoints[idx]);
+          piano(idx);
+        };
+        countGuide.appendChild(d);
+      });
+    }
+
+    // Función solicitada explícitamente
+    function renderSeries() {
+      state.seriesType = [2,3,4][Math.floor(Math.random() * 3)];
+      state.start = state.seriesType * (Math.floor(Math.random() * 4) + 1);
+      state.next = state.start + state.seriesType;
+      state.correct = state.next + state.seriesType;
+
+      instruction.textContent = `¡Lleva a la mariquita de ${state.seriesType} en ${state.seriesType}!`;
+      elevatorFloor.textContent = `${state.start} → ${state.next} → ?`;
+      buildGuide();
+
+      const distractor1 = state.next + 1;
+      const distractor2 = state.next + ([2,3,4].find((v) => v !== state.seriesType));
+      const options = [state.correct, distractor1, distractor2].sort(() => Math.random() - 0.5);
+
+      seriesChoices.innerHTML = '';
+      options.forEach((num) => {
+        const btn = document.createElement('button');
+        btn.className = 'bubble-btn';
+        btn.textContent = num;
+        btn.onclick = () => checkAnswer('series', num, btn);
+        seriesChoices.appendChild(btn);
+      });
+      updateStatus();
+    }
+
+    function resetPlaceRound() {
+      state.C = 0; state.D = 0; state.U = 0;
+      state.target = Math.floor(Math.random() * 900) + 100;
+      const c = Math.floor(state.target / 100);
+      const d = Math.floor((state.target % 100) / 10);
+      const u = state.target % 10;
+      digitC.textContent = c;
+      digitD.textContent = d;
+      digitU.textContent = u;
+      [digitC, digitD, digitU].forEach((el) => el.classList.remove('on'));
+      renderPay();
+    }
+
+    function renderPay() {
+      items.innerHTML = '';
+      for (let i = 0; i < state.C; i++) items.innerHTML += '<span>🧺100🙂</span>';
+      for (let i = 0; i < state.D; i++) items.innerHTML += '<span>🫙10✨</span>';
+      for (let i = 0; i < state.U; i++) items.innerHTML += '<span>💧1👀</span>';
+
+      const cV = state.C * 100;
+      const dV = state.D * 10;
+      const uV = state.U;
+      const total = cV + dV + uV;
+      formula.innerHTML = `<span class='c'>${cV}</span> + <span class='d'>${dV}</span> + <span class='u'>${uV}</span> = ${total}`;
+
+      const tc = Math.floor(state.target / 100);
+      const td = Math.floor((state.target % 100) / 10);
+      const tu = state.target % 10;
+      digitC.classList.toggle('on', state.C === tc);
+      digitD.classList.toggle('on', state.D === td);
+      digitU.classList.toggle('on', state.U === tu);
+    }
+
+    function checkAnswer(mode, value = null, btn = null) {
+      if (mode === 'series') {
+        if (value === state.correct) {
+          state.score += 10;
+          state.hits += 1;
+          msg.textContent = '¡Excelente! La mariquita subió feliz.';
+          msg.className = 'panel msg ok';
+          ladybug.classList.add('bee-scale');
+          setTimeout(() => ladybug.classList.remove('bee-scale'), 420);
+          magicBell();
+          sparkle();
+          updateStatus();
+          if (state.hits % 2 === 0) {
+            setScene('place');
+            instruction.textContent = '¡Paga la habitación!';
+            resetPlaceRound();
+          } else {
+            setTimeout(renderSeries, 560);
+          }
+        } else {
+          softError();
+          msg.textContent = 'Ups, revisa los puntos de ayuda.';
+          msg.className = 'panel msg bad';
+          if (btn) {
+            btn.classList.add('error');
+            setTimeout(() => btn.classList.remove('error'), 560);
+          }
+          [...countGuide.children].forEach((dot, idx) => {
+            setTimeout(() => dot.classList.toggle('on', !state.guidePoints[idx]), idx * 60);
+            setTimeout(() => dot.classList.toggle('on', state.guidePoints[idx]), idx * 60 + 180);
+          });
+        }
+      }
+
+      if (mode === 'place') {
+        const current = state.C * 100 + state.D * 10 + state.U;
+        if (current === state.target) {
+          state.score += 15;
+          state.hits += 1;
+          msg.textContent = '¡Pago correcto! Habitación desbloqueada.';
+          msg.className = 'panel msg ok';
+          magicBell();
+          sparkle(window.innerWidth * 0.6, window.innerHeight * 0.5);
+          updateStatus();
+          setScene('series');
+          instruction.textContent = '¡Completa la serie!';
+          setTimeout(renderSeries, 560);
+        } else {
+          softError();
+          msg.textContent = `Vas en ${current}. Objetivo: ${state.target}.`;
+          msg.className = 'panel msg bad';
+        }
+      }
+    }
+
+    document.getElementById('addC').onclick = () => { if (state.C < 9) { state.C += 1; piano(0); renderPay(); } };
+    document.getElementById('addD').onclick = () => { if (state.D < 9) { state.D += 1; piano(1); renderPay(); } };
+    document.getElementById('addU').onclick = () => { if (state.U < 9) { state.U += 1; piano(2); renderPay(); } };
+    document.getElementById('checkPay').onclick = () => checkAnswer('place');
+    document.getElementById('resetPay').onclick = () => { state.C = 0; state.D = 0; state.U = 0; renderPay(); };
+
+    initFireflies();
+    renderSeries();
+  </script>
+</body>
+</html>
