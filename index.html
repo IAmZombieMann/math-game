@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Tren de los Helados Mágicos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brown: #8a5c39;
+      --cream: #fffdf7;
+      --pink: #ffc6e8;
+      --lila: #cab6ff;
+      --green: #88d79d;
+      --red: #ff8ea0;
+      --blue: #84d9ff;
+      --yellow: #ffe08a;
+      --ink: #51321e;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body {
+      font-family: "Quicksand", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(160deg, var(--lila), var(--pink));
+      overflow: hidden;
+    }
+
+    .sky-cloud {
+      position: fixed;
+      width: 210px;
+      height: 90px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 999px;
+      filter: blur(0.4px);
+      animation: cloudMove linear infinite;
+      z-index: 0;
+    }
+    .sky-cloud::before, .sky-cloud::after {
+      content: "";
+      position: absolute;
+      background: rgba(255,255,255,0.85);
+      border-radius: 50%;
+    }
+    .sky-cloud::before { width: 90px; height: 90px; top: -36px; left: 28px; }
+    .sky-cloud::after { width: 74px; height: 74px; top: -24px; right: 28px; }
+    @keyframes cloudMove { from { transform: translateX(-240px); } to { transform: translateX(calc(100vw + 260px)); } }
+
+    .app {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      padding: 16px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 10px;
+    }
+    .card {
+      background: var(--cream);
+      border: 5px solid var(--brown);
+      border-radius: 24px;
+      padding: 12px;
+      box-shadow: 0 8px 0 rgba(111, 76, 49, 0.25);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .title { font-size: clamp(28px, 4vw, 44px); margin: 0; }
+    .score { font-size: clamp(18px, 2.5vw, 24px); font-weight: 800; }
+    .instruction { font-size: clamp(40px, 4.8vw, 50px); margin: 0; text-align: center; }
+
+    .scene { display: none; }
+    .scene.active { display: block; }
+
+    .train-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+    .engine {
+      background: #ffe7a9;
+      border: 5px solid var(--brown);
+      border-radius: 20px;
+      min-height: 180px;
+      display: grid;
+      place-items: center;
+      font-size: 80px;
+      position: relative;
+    }
+    .cat-msg {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      right: 8px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #9a3d68;
+    }
+    .wagons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .wagon {
+      border: 5px solid var(--brown);
+      background: #fff7fb;
+      border-radius: 20px;
+      min-height: 170px;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .wagon-num { font-size: clamp(62px, 8vw, 80px); font-weight: 800; }
+    .wagon-ice {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      font-size: 32px;
+    }
+    .question { color: #ff79be; text-shadow: 0 0 8px rgba(255,121,190,0.5); }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .answer {
+      border: 5px solid var(--brown);
+      border-radius: 24px;
+      background: #fffdf4;
+      padding: 12px;
+    }
+    .answer-btn {
+      width: 100%;
+      border: 5px solid var(--brown);
+      border-radius: 18px;
+      background: linear-gradient(140deg, #fff2a8, #ffd0ea);
+      padding: 30px;
+      font-size: clamp(60px, 7vw, 80px);
+      font-weight: 800;
+      cursor: pointer;
+      color: var(--ink);
+    }
+    .dots {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 30px;
+    }
+    .dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 3px solid var(--brown);
+      background: rgba(255,255,255,0.6);
+      cursor: pointer;
+    }
+    .dot.marked { background: #ffcf54; }
+
+    .pay-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .jars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .jar {
+      border: 5px solid var(--brown);
+      border-radius: 24px;
+      background: #fefbff;
+      padding: 12px;
+      text-align: center;
+    }
+    .jar button {
+      width: 100%;
+      border: 5px solid var(--brown);
+      border-radius: 16px;
+      padding: 30px;
+      font-size: 30px;
+      font-weight: 800;
+      cursor: pointer;
+      color: #2f2520;
+    }
+    .jar.green button { background: var(--green); }
+    .jar.red button { background: var(--red); }
+    .jar.blue button { background: var(--blue); }
+
+    .cup {
+      border: 5px solid var(--brown);
+      border-radius: 24px;
+      padding: 12px;
+      background: #fffdf4;
+      min-height: 220px;
+    }
+    .cup-title { margin: 0 0 8px; font-size: 24px; font-weight: 800; }
+    .flying-items { min-height: 90px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .item { font-size: 34px; }
+    .formula { font-size: clamp(28px, 3vw, 40px); font-weight: 800; }
+    .formula .c { color: var(--green); }
+    .formula .d { color: var(--red); }
+    .formula .u { color: var(--blue); }
+
+    .controls { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .controls button {
+      border: 5px solid var(--brown);
+      border-radius: 14px;
+      padding: 10px 18px;
+      font-size: 20px;
+      font-weight: 800;
+      cursor: pointer;
+      background: #ffe8a5;
+    }
+
+    .bottom-msg {
+      min-height: 34px;
+      font-size: 26px;
+      font-weight: 800;
+      text-align: center;
+    }
+    .ok { color: #2e8f5c; }
+    .bad { color: #b84d5c; }
+
+    .particle {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      animation: pop 900ms ease-out forwards;
+      pointer-events: none;
+      z-index: 8;
+    }
+    @keyframes pop {
+      from { transform: translate(0,0) scale(1); opacity: 1; }
+      to { transform: translate(var(--tx), var(--ty)) scale(0.2); opacity: 0; }
+    }
+
+    @media (max-width: 980px) {
+      .train-row { grid-template-columns: 1fr; }
+      .pay-layout { grid-template-columns: 1fr; }
+      .wagons, .answers, .jars { grid-template-columns: 1fr; }
+      .answer-btn { font-size: 54px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sky-cloud" style="top:7%;animation-duration:35s"></div>
+  <div class="sky-cloud" style="top:22%;animation-duration:42s"></div>
+  <div class="sky-cloud" style="top:39%;animation-duration:30s"></div>
+
+  <main class="app">
+    <header class="card topbar">
+      <h1 class="title">🚂 El Tren de los Helados Mágicos</h1>
+      <div class="score" id="scoreBoard">Puntos: 0 | Aciertos: 0 | Paisaje: Bosque de dulces</div>
+    </header>
+
+    <section class="card">
+      <p class="instruction" id="instruction">¡Completa la serie!</p>
+    </section>
+
+    <section id="sceneSeries" class="scene active card">
+      <div class="train-row">
+        <div class="engine" id="engineFace">🐱‍🍳
+          <div class="cat-msg" id="catMsg">¡Vamos por helado!</div>
+        </div>
+        <div class="wagons" id="wagons"></div>
+      </div>
+
+      <div class="answers" id="answers"></div>
+    </section>
+
+    <section id="scenePay" class="scene card">
+      <div class="pay-layout">
+        <div>
+          <div class="jars">
+            <div class="jar green"><button id="addC">Bote C +100</button></div>
+            <div class="jar red"><button id="addD">Bote D +10</button></div>
+            <div class="jar blue"><button id="addU">Bote U +1</button></div>
+          </div>
+          <div class="controls">
+            <button id="checkPay">Verificar pago</button>
+            <button id="resetPay">Reiniciar</button>
+          </div>
+        </div>
+
+        <div class="cup">
+          <p class="cup-title">Cliente pide: <span id="targetPrice">235</span> monedas mágicas</p>
+          <div class="flying-items" id="cupItems"></div>
+          <div class="formula" id="formula">0 + 0 + 0 = 0</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="card bottom-msg" id="messageBar">Toca una opción para jugar.</footer>
+  </main>
+
+  <script>
+    const state = {
+      score: 0,
+      hits: 0,
+      currentLevel: 'series',
+      seriesType: 2,
+      seriesA: 2,
+      seriesB: 4,
+      correctSeries: 6,
+      landscapeIndex: 0,
+      landscapes: ['Bosque de dulces', 'Desierto de galleta', 'Valle de malvavisco'],
+      payTarget: 235,
+      C: 0,
+      D: 0,
+      U: 0
+    };
+
+    const instruction = document.getElementById('instruction');
+    const scoreBoard = document.getElementById('scoreBoard');
+    const messageBar = document.getElementById('messageBar');
+    const wagons = document.getElementById('wagons');
+    const answers = document.getElementById('answers');
+    const catMsg = document.getElementById('catMsg');
+    const sceneSeries = document.getElementById('sceneSeries');
+    const scenePay = document.getElementById('scenePay');
+    const targetPrice = document.getElementById('targetPrice');
+    const cupItems = document.getElementById('cupItems');
+    const formula = document.getElementById('formula');
+
+    function updateScore() {
+      scoreBoard.textContent = `Puntos: ${state.score} | Aciertos: ${state.hits} | Paisaje: ${state.landscapes[state.landscapeIndex]}`;
+    }
+
+    function playTone(freq, duration = 0.08, type = 'triangle', gain = 0.05) {
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ac.createOscillator();
+      const g = ac.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      g.gain.value = gain;
+      osc.connect(g);
+      g.connect(ac.destination);
+      osc.start();
+      setTimeout(() => {
+        g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.03);
+        osc.stop(ac.currentTime + 0.04);
+      }, duration * 1000);
+    }
+    function sndPop() { playTone(540, 0.06, 'triangle', 0.04); }
+    function sndOk() { [620,740,880].forEach((f,i)=>setTimeout(()=>playTone(f,0.08,'triangle',0.06), i*75)); }
+    function sndBad() { [260,210].forEach((f,i)=>setTimeout(()=>playTone(f,0.09,'sawtooth',0.04), i*95)); }
+
+    function burst(x = window.innerWidth / 2, y = window.innerHeight / 2) {
+      const colors = ['#fff', '#ffb3e0', '#8dd9ff', '#ffe57e', '#9be8ad'];
+      for (let i = 0; i < 42; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = `${x}px`;
+        p.style.top = `${y}px`;
+        p.style.background = colors[i % colors.length];
+        p.style.setProperty('--tx', `${Math.random() * 260 - 130}px`);
+        p.style.setProperty('--ty', `${Math.random() * 260 - 130}px`);
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 900);
+      }
+    }
+
+    function landscapeStep() {
+      if (state.hits > 0 && state.hits % 3 === 0) {
+        state.landscapeIndex = (state.landscapeIndex + 1) % state.landscapes.length;
+        messageBar.textContent = `¡El tren avanza! Nuevo paisaje: ${state.landscapes[state.landscapeIndex]}`;
+      }
+    }
+
+    function newSeriesRound() {
+      state.seriesType = [2,3,4][Math.floor(Math.random()*3)];
+      const start = (Math.floor(Math.random() * 5) + 1) * state.seriesType;
+      state.seriesA = start;
+      state.seriesB = start + state.seriesType;
+      state.correctSeries = state.seriesB + state.seriesType;
+      instruction.textContent = '¡Completa la serie!';
+      renderSeries();
+    }
+
+    function buildDots(diff) {
+      const arr = Array.from({ length: Math.min(10, Math.max(1, diff)) }, () => false);
+      return arr;
+    }
+
+    function renderSeries() {
+      wagons.innerHTML = `
+        <div class="wagon"><div class="wagon-ice">🍦</div><div class="wagon-num">${state.seriesA}</div></div>
+        <div class="wagon"><div class="wagon-ice">🍦</div><div class="wagon-num">${state.seriesB}</div></div>
+        <div class="wagon"><div class="wagon-ice">❔</div><div class="wagon-num question">?</div></div>
+      `;
+
+      const opts = new Set([state.correctSeries]);
+      while (opts.size < 3) {
+        const candidate = state.correctSeries + (Math.floor(Math.random() * 5) - 2) * state.seriesType;
+        if (candidate > 0 && candidate !== state.correctSeries) opts.add(candidate);
+      }
+
+      answers.innerHTML = '';
+      [...opts].sort(() => Math.random() - 0.5).forEach((opt) => {
+        const diff = Math.abs(opt - state.seriesB);
+        const marks = buildDots(diff);
+        const container = document.createElement('article');
+        container.className = 'answer';
+
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer('series', opt);
+
+        const dots = document.createElement('div');
+        dots.className = 'dots';
+        marks.forEach((_, idx) => {
+          const dot = document.createElement('button');
+          dot.className = 'dot';
+          dot.onclick = () => {
+            marks[idx] = !marks[idx];
+            dot.classList.toggle('marked', marks[idx]);
+            sndPop();
+          };
+          dots.appendChild(dot);
+        });
+
+        container.appendChild(btn);
+        container.appendChild(dots);
+        answers.appendChild(container);
+      });
+
+      catMsg.textContent = `Salta de ${state.seriesType} en ${state.seriesType}`;
+    }
+
+    function showPayScene() {
+      state.currentLevel = 'pay';
+      sceneSeries.classList.remove('active');
+      scenePay.classList.add('active');
+      instruction.textContent = '¡Paga con chispitas!';
+      newPayRound();
+    }
+
+    function showSeriesScene() {
+      state.currentLevel = 'series';
+      scenePay.classList.remove('active');
+      sceneSeries.classList.add('active');
+      newSeriesRound();
+    }
+
+    function newPayRound() {
+      state.C = 0; state.D = 0; state.U = 0;
+      state.payTarget = Math.floor(Math.random() * 900) + 100;
+      targetPrice.textContent = state.payTarget;
+      renderPay();
+    }
+
+    function renderPay() {
+      cupItems.innerHTML = '';
+      for (let i = 0; i < state.C; i++) cupItems.innerHTML += '<span class="item" style="color:var(--green)">🍵</span>';
+      for (let i = 0; i < state.D; i++) cupItems.innerHTML += '<span class="item" style="color:var(--red)">🧇</span>';
+      for (let i = 0; i < state.U; i++) cupItems.innerHTML += '<span class="item" style="color:var(--blue)">🫐</span>';
+
+      const cValue = state.C * 100;
+      const dValue = state.D * 10;
+      const uValue = state.U;
+      const total = cValue + dValue + uValue;
+      formula.innerHTML = `<span class="c">${cValue}</span> + <span class="d">${dValue}</span> + <span class="u">${uValue}</span> = ${total}`;
+    }
+
+    function addToken(type) {
+      sndPop();
+      if (type === 'C' && state.C < 9) state.C += 1;
+      if (type === 'D' && state.D < 9) state.D += 1;
+      if (type === 'U' && state.U < 9) state.U += 1;
+      renderPay();
+    }
+
+    function currentPay() { return state.C * 100 + state.D * 10 + state.U; }
+
+    function checkAnswer(mode, value = null) {
+      if (mode === 'series') {
+        if (value === state.correctSeries) {
+          sndOk();
+          burst();
+          state.score += 10;
+          state.hits += 1;
+          catMsg.textContent = '¡Miau, delicioso! 🍒';
+          messageBar.textContent = '¡Correcto! El helado cae en el cono.';
+          messageBar.className = 'card bottom-msg ok';
+          landscapeStep();
+          updateScore();
+
+          if (state.hits % 2 === 0) {
+            setTimeout(showPayScene, 700);
+          } else {
+            setTimeout(newSeriesRound, 650);
+          }
+        } else {
+          sndBad();
+          messageBar.textContent = 'Casi, intenta otra bola de helado.';
+          messageBar.className = 'card bottom-msg bad';
+        }
+      }
+
+      if (mode === 'pay') {
+        if (currentPay() === state.payTarget) {
+          sndOk();
+          burst(window.innerWidth * 0.65, window.innerHeight * 0.45);
+          state.score += 15;
+          state.hits += 1;
+          messageBar.textContent = '¡Pago perfecto!';
+          messageBar.className = 'card bottom-msg ok';
+          landscapeStep();
+          updateScore();
+          setTimeout(showSeriesScene, 700);
+        } else {
+          sndBad();
+          messageBar.textContent = `Llevas ${currentPay()}. Necesitas ${state.payTarget}.`;
+          messageBar.className = 'card bottom-msg bad';
+        }
+      }
+    }
+
+    document.getElementById('addC').onclick = () => addToken('C');
+    document.getElementById('addD').onclick = () => addToken('D');
+    document.getElementById('addU').onclick = () => addToken('U');
+    document.getElementById('checkPay').onclick = () => checkAnswer('pay');
+    document.getElementById('resetPay').onclick = () => { state.C = 0; state.D = 0; state.U = 0; renderPay(); };
+
+    updateScore();
+    newSeriesRound();
+  </script>
+</body>
+</html>
