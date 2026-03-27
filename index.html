@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fábrica de Cristales Espaciales Kawaii</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #2a2a4a;
+        --cream: #fffdf9;
+        --brown: #6f4d2d;
+        --ink: #402715;
+        --u: #46d0f6;
+        --d: #ff8f9f;
+        --c: #86d89f;
+        --cloud: #fff7ef;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Quicksand", sans-serif;
+        background: radial-gradient(circle at 15% 20%, #ffd8f2 0%, transparent 34%),
+          radial-gradient(circle at 80% 30%, #c2f6ff 0%, transparent 34%),
+          radial-gradient(circle at 50% 90%, #ffd9e6 0%, transparent 36%),
+          var(--bg);
+        color: var(--ink);
+        overflow-x: hidden;
+      }
+      .stars {
+        position: fixed; inset: 0; pointer-events: none;
+        background-image: radial-gradient(circle at 10% 20%, #fff 0 6px, transparent 6px),
+          radial-gradient(circle at 33% 70%, #fff 0 5px, transparent 5px),
+          radial-gradient(circle at 74% 25%, #fff 0 6px, transparent 6px),
+          radial-gradient(circle at 88% 76%, #fff 0 4px, transparent 4px);
+        opacity: 0.5;
+      }
+
+      .app {
+        width: min(980px, 94vw);
+        margin: 0 auto;
+        padding: 14px;
+      }
+      .panel {
+        background: linear-gradient(180deg, #fffefb, #fff8ef);
+        border: 4px solid var(--brown);
+        border-radius: 22px;
+        padding: 14px;
+        margin-bottom: 10px;
+        box-shadow: 0 7px 0 rgba(88, 56, 27, 0.35);
+      }
+      .screen { display: none; }
+      .screen.active { display: block; }
+
+      h1, h2 { margin: 0 0 10px; }
+      .title { font-size: clamp(20px, 2.6vw, 28px); }
+      .mission-title { font-size: clamp(20px, 2.7vw, 26px); margin-bottom: 8px; }
+      .big-number { font-size: clamp(32px, 4.8vw, 44px); font-weight: 800; line-height: 1; }
+      .helper-text { font-size: clamp(14px, 1.7vw, 18px); font-weight: 700; margin: 4px 0 8px; }
+
+      .btn {
+        border: 4px solid var(--brown);
+        border-radius: 999px;
+        background: linear-gradient(130deg, #ffe995, #ffd175);
+        color: var(--ink);
+        font-size: clamp(14px, 1.7vw, 17px);
+        font-weight: 800;
+        padding: 10px 14px;
+        cursor: pointer;
+      }
+      .btn:active { transform: translateY(2px); }
+      .btn:hover { filter: brightness(1.03); }
+      .btn-row { display: flex; flex-wrap: wrap; gap: 20px; }
+
+      .series-layout {
+        display: grid;
+        grid-template-columns: 170px 1fr;
+        gap: 12px;
+        align-items: start;
+      }
+      .robot {
+        background: #fff2d6;
+        border: 4px solid var(--brown);
+        border-radius: 18px;
+        padding: 8px;
+        text-align: center;
+        font-size: 64px;
+      }
+      .platforms {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+        gap: 10px;
+      }
+      .platform {
+        background: var(--cloud);
+        border: 4px solid var(--brown);
+        border-radius: 999px;
+        min-height: 90px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        cursor: pointer;
+        padding: 10px;
+        transition: transform 0.18s ease, background 0.2s ease;
+      }
+      .platform:hover { transform: translateY(-4px); }
+      .platform:nth-child(2n) { background: linear-gradient(180deg, #fffdfa, #ffeef6); }
+      .platform .num { font-size: clamp(28px, 4.2vw, 36px); font-weight: 800; }
+      .platform .face { font-size: 16px; }
+      .platform.wrong { animation: wrongShake 420ms ease; background: #d8d8d8; }
+      @keyframes wrongShake {
+        0%,100% { transform: translateX(0); }
+        30% { transform: translateX(-8px); }
+        60% { transform: translateX(8px); }
+      }
+      .robot.jump { animation: jump 460ms ease; }
+      @keyframes jump {
+        0% { transform: translateY(0); }
+        45% { transform: translateY(-36px); }
+        100% { transform: translateY(0); }
+      }
+
+      .feedback { min-height: 28px; font-size: clamp(14px, 1.8vw, 17px); font-weight: 800; margin-top: 8px; }
+      .ok { color: #198754; }
+      .bad { color: #b33d3d; }
+
+      .target-cloud {
+        background: #fff4fc;
+        border: 4px solid var(--brown);
+        border-radius: 999px;
+        padding: 6px 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 14px;
+      }
+
+      .zones {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+      .zone {
+        background: #fffdf8;
+        border: 4px solid var(--brown);
+        border-radius: 16px;
+        padding: 8px;
+        min-height: 190px;
+      }
+      .zone h3 {
+        margin: 0 0 12px;
+        font-size: clamp(14px, 1.8vw, 18px);
+      }
+      .tray {
+        border: 3px dashed var(--brown);
+        border-radius: 12px;
+        min-height: 120px;
+        padding: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-content: flex-start;
+      }
+
+      .unit,.ten,.hundred {
+        width: 44px; height: 44px;
+        position: relative;
+      }
+      .unit {
+        background: var(--u);
+        border: 4px solid #2f8b96;
+        border-radius: 60% 60% 70% 70%;
+      }
+      .ten {
+        width: 64px;
+        border-radius: 16px;
+        background: var(--d);
+        border: 4px solid #b9473f;
+      }
+      .hundred {
+        width: 72px; height: 72px;
+        border-radius: 18px;
+        background: var(--c);
+        border: 4px solid #4f8b5d;
+      }
+      .unit::after,.ten::after,.hundred::after {
+        content: ":‿";
+        position: absolute;
+        left: 50%; top: 50%;
+        transform: translate(-50%,-50%);
+        font-size: 16px;
+        color: #2b2217;
+        font-weight: 800;
+      }
+
+      .controls { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+      .btn-c { background: var(--c); }
+      .btn-d { background: var(--d); }
+      .btn-u { background: var(--u); }
+
+      .burst {
+        position: fixed; width: 14px; height: 14px; border-radius: 50%; pointer-events: none;
+        animation: burst 780ms ease-out forwards;
+      }
+      @keyframes burst {
+        from { transform: translate(0,0) scale(1); opacity: 1; }
+        to { transform: translate(var(--tx), var(--ty)) scale(0.3); opacity: 0; }
+      }
+
+      @media (max-width: 1024px) {
+        .series-layout { grid-template-columns: 1fr; }
+        .robot { font-size: 88px; }
+        .zones { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stars"></div>
+    <main class="app">
+      <section class="panel">
+        <h1 class="title">Fábrica de Cristales Espaciales (Kawaii)</h1>
+        <p class="helper-text" style="font-size: clamp(14px,1.9vw,18px);">Interfaz clara y amigable para aprender jugando.</p>
+      </section>
+
+      <section id="pantalla_inicio" class="panel screen active">
+        <h2 class="mission-title">Hola, mini astronauta</h2>
+        <p class="helper-text">Misión 1: Saltar de 2 en 2, 3 en 3 y 4 en 4.</p>
+        <p class="helper-text">Misión 2: Construir centenas, decenas y unidades.</p>
+        <button class="btn" id="startBtn">Comenzar aventura</button>
+      </section>
+
+      <section id="nivel_series" class="panel screen">
+        <h2 class="mission-title" id="seriesMission">¡Salta de 2 en 2!</h2>
+        <div class="series-layout">
+          <div id="kawaiiRobot" class="robot">🤖</div>
+          <div>
+            <p class="helper-text">Robot en: <span class="big-number" id="robotPos">0</span></p>
+            <div class="platforms" id="platforms"></div>
+          </div>
+        </div>
+        <div id="seriesFeedback" class="feedback"></div>
+      </section>
+
+      <section id="nivel_posicional" class="panel screen">
+        <h2 class="mission-title">Pon la energía correcta en la nave</h2>
+        <div class="target-cloud">
+          <span class="helper-text" style="margin:0;">Objetivo:</span>
+          <span class="big-number" id="targetNumber">135</span>
+        </div>
+
+        <div class="zones">
+          <article class="zone">
+            <h3>C (Centenas)</h3>
+            <div class="tray" id="zoneC"></div>
+          </article>
+          <article class="zone">
+            <h3>D (Decenas)</h3>
+            <div class="tray" id="zoneD"></div>
+          </article>
+          <article class="zone">
+            <h3>U (Unidades)</h3>
+            <div class="tray" id="zoneU"></div>
+          </article>
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-c" id="addC">+100</button>
+          <button class="btn btn-d" id="addD">+10</button>
+          <button class="btn btn-u" id="addU">+1</button>
+          <button class="btn" id="checkBtn">Verificar</button>
+          <button class="btn" id="resetBtn">Reiniciar</button>
+        </div>
+        <div id="posFeedback" class="feedback"></div>
+      </section>
+
+      <section id="felicitacion_final" class="panel screen">
+        <h2 class="mission-title">Fanfarria espacial: ¡Ganaste!</h2>
+        <p class="helper-text" id="finalText"></p>
+        <button class="btn" id="againBtn">Jugar otra vez</button>
+      </section>
+    </main>
+
+    <script>
+      const state = {
+        screen: "pantalla_inicio",
+        step: 2,
+        current: 0,
+        seriesHits: 0,
+        seriesGoal: 7,
+        target: 0,
+        C: 0,
+        D: 0,
+        U: 0,
+        posHits: 0,
+        posGoal: 4,
+        score: 0
+      };
+
+      const screens = ["pantalla_inicio", "nivel_series", "nivel_posicional", "felicitacion_final"];
+      const robot = document.getElementById("kawaiiRobot");
+      const robotPos = document.getElementById("robotPos");
+      const platforms = document.getElementById("platforms");
+      const seriesMission = document.getElementById("seriesMission");
+      const seriesFeedback = document.getElementById("seriesFeedback");
+      const targetNumber = document.getElementById("targetNumber");
+      const zoneC = document.getElementById("zoneC");
+      const zoneD = document.getElementById("zoneD");
+      const zoneU = document.getElementById("zoneU");
+      const posFeedback = document.getElementById("posFeedback");
+      const finalText = document.getElementById("finalText");
+
+      function setScreen(name) {
+        state.screen = name;
+        screens.forEach((id) => document.getElementById(id).classList.toggle("active", id === name));
+      }
+
+      function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+      function tone(freq, duration = 0.12, type = "triangle", gainValue = 0.05) {
+        const ac = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.value = gainValue;
+        osc.connect(gain);
+        gain.connect(ac.destination);
+        osc.start();
+        setTimeout(() => {
+          gain.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.02);
+          osc.stop(ac.currentTime + 0.03);
+        }, duration * 1000);
+      }
+
+      function soundOk() { tone(880, 0.07, "triangle", 0.06); setTimeout(() => tone(1220, 0.08, "triangle", 0.06), 80); }
+      function soundBad() { tone(220, 0.14, "sawtooth", 0.045); setTimeout(() => tone(170, 0.12, "sawtooth", 0.04), 100); }
+      function soundFinal() { [523,659,784,1046].forEach((f,i)=>setTimeout(()=>tone(f,0.11,"triangle",0.06), i*95)); }
+
+      function burst(x = window.innerWidth * 0.5, y = window.innerHeight * 0.28) {
+        const colors = ["#4dd0e1", "#ff8a80", "#81c784", "#ffe082", "#ffffff"];
+        for (let i = 0; i < 30; i++) {
+          const p = document.createElement("div");
+          p.className = "burst";
+          p.style.left = `${x}px`;
+          p.style.top = `${y}px`;
+          p.style.background = colors[i % colors.length];
+          p.style.setProperty("--tx", `${rand(-160, 160)}px`);
+          p.style.setProperty("--ty", `${rand(-130, 130)}px`);
+          document.body.appendChild(p);
+          setTimeout(() => p.remove(), 800);
+        }
+      }
+
+      function resetSeries() {
+        state.step = [2, 3, 4][rand(0, 2)];
+        state.current = rand(0, 6) * state.step;
+        seriesMission.textContent = `¡Ayuda al robot a saltar de ${state.step} en ${state.step}!`;
+        robotPos.textContent = state.current;
+        renderPlatforms();
+      }
+
+      function renderPlatforms() {
+        platforms.innerHTML = "";
+        const correct = state.current + state.step;
+        const options = new Set([correct]);
+        while (options.size < 4) {
+          const candidate = state.current + rand(1, 8);
+          if (candidate !== correct) options.add(candidate);
+        }
+        [...options].sort(() => Math.random() - 0.5).forEach((value) => {
+          const plat = document.createElement("button");
+          plat.className = "platform";
+          const face = value === correct ? "•ᴗ•" : "•_•";
+          plat.innerHTML = `<div class="num">${value}</div><div class="face">${face}</div>`;
+          plat.onclick = () => checkAnswer("series", value, plat);
+          platforms.appendChild(plat);
+        });
+      }
+
+      function renderZones() {
+        zoneC.innerHTML = "";
+        zoneD.innerHTML = "";
+        zoneU.innerHTML = "";
+        for (let i = 0; i < state.C; i++) zoneC.appendChild(Object.assign(document.createElement("div"), { className: "hundred" }));
+        for (let i = 0; i < state.D; i++) zoneD.appendChild(Object.assign(document.createElement("div"), { className: "ten" }));
+        for (let i = 0; i < state.U; i++) zoneU.appendChild(Object.assign(document.createElement("div"), { className: "unit" }));
+      }
+
+      function startPositionalRound() {
+        state.C = 0; state.D = 0; state.U = 0;
+        state.target = rand(100, 999);
+        targetNumber.textContent = state.target;
+        posFeedback.textContent = "Construye el número con C, D y U.";
+        posFeedback.className = "feedback";
+        renderZones();
+      }
+
+      function valueNow() { return state.C * 100 + state.D * 10 + state.U; }
+
+      // Función requerida explícitamente
+      function checkAnswer(mode, answer = null, node = null) {
+        if (mode === "series") {
+          const correct = state.current + state.step;
+          if (Number(answer) === correct) {
+            state.score += 10;
+            state.seriesHits += 1;
+            state.current = correct;
+            robotPos.textContent = state.current;
+            robot.classList.add("jump");
+            setTimeout(() => robot.classList.remove("jump"), 420);
+            seriesFeedback.textContent = "¡Sí! Salto perfecto.";
+            seriesFeedback.className = "feedback ok";
+            soundOk();
+            burst();
+            if (state.current >= 40 || state.seriesHits >= state.seriesGoal) {
+              setTimeout(() => {
+                setScreen("nivel_posicional");
+                state.posHits = 0;
+                startPositionalRound();
+              }, 650);
+            } else {
+              setTimeout(renderPlatforms, 450);
+            }
+          } else {
+            seriesFeedback.textContent = "Ups... intenta otra nube.";
+            seriesFeedback.className = "feedback bad";
+            soundBad();
+            if (node) {
+              node.classList.add("wrong");
+              setTimeout(() => node.classList.remove("wrong"), 450);
+            }
+          }
+          return;
+        }
+
+        if (mode === "posicional") {
+          if (valueNow() === state.target) {
+            state.score += 20;
+            state.posHits += 1;
+            posFeedback.textContent = "¡Genial! Energía correcta.";
+            posFeedback.className = "feedback ok";
+            soundOk();
+            burst(window.innerWidth * 0.6, window.innerHeight * 0.45);
+            if (state.posHits >= state.posGoal) {
+              setTimeout(() => {
+                setScreen("felicitacion_final");
+                finalText.textContent = `Puntaje final: ${state.score}. Completaste toda la misión espacial.`;
+                soundFinal();
+                burst(window.innerWidth * 0.5, window.innerHeight * 0.3);
+              }, 700);
+            } else {
+              setTimeout(startPositionalRound, 700);
+            }
+          } else {
+            posFeedback.textContent = `Ahora tienes ${valueNow()}. Sigue hasta ${state.target}.`;
+            posFeedback.className = "feedback bad";
+            soundBad();
+          }
+        }
+      }
+
+      document.getElementById("startBtn").onclick = () => {
+        state.score = 0;
+        state.seriesHits = 0;
+        setScreen("nivel_series");
+        resetSeries();
+      };
+
+      document.getElementById("addC").onclick = () => { if (state.C < 9) { state.C += 1; renderZones(); soundOk(); } };
+      document.getElementById("addD").onclick = () => { if (state.D < 9) { state.D += 1; renderZones(); soundOk(); } };
+      document.getElementById("addU").onclick = () => { if (state.U < 9) { state.U += 1; renderZones(); soundOk(); } };
+      document.getElementById("checkBtn").onclick = () => checkAnswer("posicional");
+      document.getElementById("resetBtn").onclick = () => { state.C = 0; state.D = 0; state.U = 0; renderZones(); };
+      document.getElementById("againBtn").onclick = () => setScreen("pantalla_inicio");
+    </script>
+  </body>
+</html>
